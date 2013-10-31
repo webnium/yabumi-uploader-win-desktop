@@ -14,3 +14,6 @@ ipch/
 *.vcproj.*
 *.vcxproj.filters
 *.vcxproj.user
+*.wixobj
+*.wixpdb
+*.msi

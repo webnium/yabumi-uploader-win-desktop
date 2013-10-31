@@ -1,14 +1,14 @@
-﻿// gyazowin.cpp : アプリケーションのエントリ ポイントを定義します。
+﻿// YabumiUploader.cpp : アプリケーションのエントリ ポイントを定義します。
 //
 
 #include "stdafx.h"
-#include "gyazowin.h"
+#include "YabumiUploader.h"
 
 // グローバル変数:
 HINSTANCE hInst;							// 現在のインターフェイス
-TCHAR *szTitle			= _T("Gyazo");		// タイトル バーのテキスト
-TCHAR *szWindowClass	= _T("GYAZOWIN");	// メイン ウィンドウ クラス名
-TCHAR *szWindowClassL	= _T("GYAZOWINL");	// レイヤー ウィンドウ クラス名
+TCHAR *szTitle			= _T("Yabumi Uploader for Windows Desktop");// タイトル バーのテキスト
+TCHAR *szWindowClass	= _T("YABUMIUPLOADER");		// メイン ウィンドウ クラス名
+TCHAR *szWindowClassL	= _T("YABUMIUPLOADERL");		// レイヤー ウィンドウ クラス名
 HWND hLayerWnd;
 
 int ofX, ofY;	// 画面オフセット
@@ -22,6 +22,10 @@ LRESULT CALLBACK	LayerWndProc(HWND, UINT, WPARAM, LPARAM);
 int					GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 
 BOOL				isPng(LPCTSTR fileName);
+BOOL				isGif(LPCTSTR fileName);
+BOOL				isJpg(LPCTSTR fileName);
+BOOL				isSvg(LPCTSTR fileName);
+BOOL				isPdf(LPCTSTR fileName);
 VOID				drawRubberband(HDC hdc, LPRECT newRect, BOOL erase);
 VOID				execUrl(const char* str);
 VOID				setClipBoardText(const char* str);
@@ -63,10 +67,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	if ( 2 == __argc )
 	{
 		// ファイルをアップロードして終了
-		if (isPng(__targv[1])) {
+		if (isPng(__targv[1]) || isJpg(__targv[1]) || isGif(__targv[1]) || isSvg(__targv[1]) || isPdf(__targv[1])) {
 			// PNG はそのままupload
 			uploadFile(NULL, __targv[1]);
-		}else {
+		} else {
 			// PNG 形式に変換
 			TCHAR tmpDir[MAX_PATH], tmpFile[MAX_PATH];
 			GetTempPath(MAX_PATH, tmpDir);
@@ -122,6 +126,98 @@ BOOL isPng(LPCTSTR fileName)
 	// compare
 	for(unsigned int i=0;i<8;i++)
 		if(pngHead[i] != readHead[i]) return FALSE;
+
+	return TRUE;
+
+}
+
+// ヘッダを見て GIF 画像かどうか(一応)チェック
+BOOL isGif(LPCTSTR fileName)
+{
+	unsigned char gifHead[] = { 0x47, 0x49, 0x46 };
+	unsigned char readHead[3];
+
+	FILE *fp = NULL;
+
+	if (0 != _tfopen_s(&fp, fileName, _T("rb")) ||
+		3 != fread(readHead, 1, 3, fp)) {
+		// ファイルが読めない	
+		return FALSE;
+	}
+	fclose(fp);
+
+	// compare
+	for (unsigned int i = 0; i<3; i++)
+	if (gifHead[i] != readHead[i]) return FALSE;
+
+	return TRUE;
+
+}
+
+// ヘッダを見て JPG 画像かどうか(一応)チェック
+BOOL isJpg(LPCTSTR fileName)
+{
+	unsigned char jpgHead[] = { 0xff, 0xd8 };
+	unsigned char readHead[2];
+
+	FILE *fp = NULL;
+
+	if (0 != _tfopen_s(&fp, fileName, _T("rb")) ||
+		2 != fread(readHead, 1, 2, fp)) {
+		// ファイルが読めない	
+		return FALSE;
+	}
+	fclose(fp);
+
+	// compare
+	for (unsigned int i = 0; i<2; i++)
+	if (jpgHead[i] != readHead[i]) return FALSE;
+
+	return TRUE;
+
+}
+
+// ヘッダを見て SVG かどうか(一応)チェック
+BOOL isSvg(LPCTSTR fileName)
+{
+	unsigned char svgHead[] = { 0x3c };
+	unsigned char readHead[1];
+
+	FILE *fp = NULL;
+
+	if (0 != _tfopen_s(&fp, fileName, _T("rb")) ||
+		1 != fread(readHead, 1, 1, fp)) {
+		// ファイルが読めない	
+		return FALSE;
+	}
+	fclose(fp);
+
+	// compare
+	for (unsigned int i = 0; i<1; i++)
+	if (svgHead[i] != readHead[i]) return FALSE;
+
+	return TRUE;
+
+}
+
+// ヘッダを見て PDF かどうか(一応)チェック
+BOOL isPdf(LPCTSTR fileName)
+{
+	unsigned char pdfHead[] = { 0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e };
+	unsigned char readHead[7];
+
+	FILE *fp = NULL;
+
+	if (0 != _tfopen_s(&fp, fileName, _T("rb")) ||
+		7 != fread(readHead, 1, 7, fp)) {
+		// ファイルが読めない	
+		return FALSE;
+	}
+	fclose(fp);
+
+	// compare
+	for (unsigned int i = 0; i<7; i++)
+	if (pdfHead[i] != readHead[i]) return FALSE;
 
 	return TRUE;
 
@@ -708,90 +804,6 @@ VOID execUrl(const char* str)
 	free(wcUrl);
 }
 
-// ID を生成・ロードする
-std::string getId()
-{
-
-    TCHAR idFile[_MAX_PATH];
-	TCHAR idDir[_MAX_PATH];
-
-    SHGetSpecialFolderPath( NULL, idFile, CSIDL_APPDATA, FALSE );
-
-	 _tcscat_s( idFile, _T("\\Gyazo"));
-	 _tcscpy_s( idDir, idFile);
-	 _tcscat_s( idFile, _T("\\id.txt"));
-
-	const TCHAR*	 idOldFile			= _T("id.txt");
-	BOOL oldFileExist = FALSE;
-
-	std::string idStr;
-
-	// まずはファイルから ID をロード
-	std::ifstream ifs;
-
-	ifs.open(idFile);
-	if (! ifs.fail()) {
-		// ID を読み込む
-		ifs >> idStr;
-		ifs.close();
-	} else{		
-		std::ifstream ifsold;
-		ifsold.open(idOldFile);
-		if (! ifsold.fail()) {
-			// 同一ディレクトリからID を読み込む(旧バージョンとの互換性)
-			ifsold >> idStr;
-			ifsold.close();
-		}
-	}
-
-	return idStr;
-}
-
-// Save ID
-BOOL saveId(const WCHAR* str)
-{
-
-    TCHAR idFile[_MAX_PATH];
-	TCHAR idDir[_MAX_PATH];
-
-    SHGetSpecialFolderPath( NULL, idFile, CSIDL_APPDATA, FALSE );
-
-	 _tcscat_s( idFile, _T("\\Gyazo"));
-	 _tcscpy_s( idDir, idFile);
-	 _tcscat_s( idFile, _T("\\id.txt"));
-
-	const TCHAR*	 idOldFile			= _T("id.txt");
-
-	size_t  slen;
-	size_t  dcount;
-	slen  = _tcslen(str) + 1; // NULL
-
-	char *idStr = (char *)malloc(slen * sizeof(char));
-	// バイト文字に変換
-	wcstombs_s(&dcount, idStr, slen, str, slen);
-
-	// ID を保存する
-	CreateDirectory(idDir,NULL);
-	std::ofstream ofs;
-	ofs.open(idFile);
-	if (! ofs.fail()) {
-		ofs << idStr;
-		ofs.close();
-
-		// 旧設定ファイルの削除
-		if (PathFileExists(idOldFile)){
-			DeleteFile(idOldFile);
-		}
-	}else{
-		free(idStr);
-		return FALSE;
-	}
-
-	free(idStr);
-	return TRUE;
-}
-
-
 void LastErrorMessageBox(HWND hwnd, LPTSTR lpszError) 
 { 
     // Retrieve the system error message for the last-error code
@@ -827,8 +839,8 @@ void LastErrorMessageBox(HWND hwnd, LPTSTR lpszError)
 // PNG ファイルをアップロードする.
 BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 {
-	const TCHAR* UPLOAD_SERVER	= _T("upload.gyazo.com");
-	const TCHAR* UPLOAD_PATH	= _T("/upload.cgi");
+	const TCHAR* UPLOAD_SERVER	= _T("direct.yabumi.cc");
+	const TCHAR* UPLOAD_PATH	= _T("/api/image.txt");
 
 	const char*  sBoundary = "----BOUNDARYBOUNDARY----";		// boundary
 	const char   sCrLf[]   = { 0xd, 0xa, 0x0 };					// 改行(CR+LF)
@@ -836,27 +848,13 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 		_T("Content-type: multipart/form-data; boundary=----BOUNDARYBOUNDARY----");
 
 	std::ostringstream	buf;	// 送信メッセージ
-	std::string			idStr;	// ID
-	
-	// ID を取得
-	idStr = getId();
 
 	// メッセージの構成
-	// -- "id" part
-	buf << "--";
-	buf << sBoundary;
-	buf << sCrLf;
-	buf << "content-disposition: form-data; name=\"id\"";
-	buf << sCrLf;
-	buf << sCrLf;
-	buf << idStr;
-	buf << sCrLf;
-
 	// -- "imagedata" part
 	buf << "--";
 	buf << sBoundary;
 	buf << sCrLf;
-	buf << "content-disposition: form-data; name=\"imagedata\"; filename=\"gyazo.com\"";
+	buf << "content-disposition: form-data; name=\"imagedata\"; filename=\"yabumi.cc\"";
 	buf << sCrLf;
 	//buf << "Content-type: image/png";	// 一応
 	//buf << sCrLf;
@@ -884,7 +882,7 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 	std::string oMsg(buf.str());
 
 	// WinInet を準備 (proxy は 規定の設定を利用)
-	HINTERNET hSession    = InternetOpen(_T("Gyazowin/1.0"), 
+	HINTERNET hSession    = InternetOpen(_T("YabumiUploaderForWindowsDesktop/1.0 Gyazowin/1.0"), 
 		INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if(NULL == hSession) {
 		LastErrorMessageBox(hwnd, _T("Cannot configure wininet."));
@@ -893,8 +891,8 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 	
 	// 接続先
 	HINTERNET hConnection = InternetConnect(hSession, 
-		UPLOAD_SERVER, INTERNET_DEFAULT_HTTP_PORT,
-		NULL, NULL, INTERNET_SERVICE_HTTP, 0, NULL);
+		UPLOAD_SERVER, INTERNET_DEFAULT_HTTPS_PORT,
+		NULL, NULL, INTERNET_SERVICE_HTTP, NULL, NULL);
 	if(NULL == hConnection) {
 		LastErrorMessageBox(hwnd, _T("Cannot initiate connection."));
 		InternetCloseHandle(hSession);
@@ -904,7 +902,7 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 	// 要求先の設定
 	HINTERNET hRequest    = HttpOpenRequest(hConnection,
 		_T("POST"), UPLOAD_PATH, NULL,
-		NULL, NULL, INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_RELOAD, NULL);
+		NULL, NULL, INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_RELOAD | INTERNET_FLAG_SECURE, NULL);
 	if(NULL == hRequest) {
 		LastErrorMessageBox(hwnd, _T("Cannot compose post request."));
 		InternetCloseHandle(hConnection);
@@ -943,17 +941,21 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 		} else {
 			// upload succeeded
 
-			// get new id
-			DWORD idLen = 100;
-			TCHAR newid[100];
+			// get image url
+			DWORD urlLen = 200;
+			TCHAR imgurl[200];
 			
-			memset(newid, 0, idLen*sizeof(TCHAR));	
-			_tcscpy_s(newid, _T("X-Gyazo-Id"));
+			memset(imgurl, 0, urlLen*sizeof(TCHAR));
+			_tcscpy_s(imgurl, _T("X-Yabumi-Image-Url"));
 
-			HttpQueryInfo(hRequest, HTTP_QUERY_CUSTOM, newid, &idLen, 0);
-			if (GetLastError() != ERROR_HTTP_HEADER_NOT_FOUND && idLen != 0) {
-				//save new id
-				saveId(newid);
+			HttpQueryInfo(hRequest, HTTP_QUERY_CUSTOM, imgurl, &urlLen, 0);
+			if (GetLastError() != ERROR_HTTP_HEADER_NOT_FOUND && urlLen != 0) {
+				// クリップボードに URL をコピー
+				size_t  slen;
+				slen = _tcslen(imgurl) + 1;
+				char *cimgurl = (char *)malloc(slen * sizeof(char));
+				wcstombs_s(NULL, cimgurl, slen, imgurl, slen);
+				setClipBoardText(cimgurl);
 			}
 
 			// 結果 (URL) を読取る
@@ -970,9 +972,6 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 
 			// 取得結果は NULL terminate されていないので
 			result += '\0';
-
-			// クリップボードに URL をコピー
-			setClipBoardText(result.c_str());
 			
 			// URL を起動
 			execUrl(result.c_str()); 

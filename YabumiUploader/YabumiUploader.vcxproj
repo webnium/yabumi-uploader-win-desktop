@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D07D541C-05E9-49CC-9090-4238AB392C38}</ProjectGuid>
-    <RootNamespace>gyazowin</RootNamespace>
+    <RootNamespace>YabumiUploader</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -89,22 +89,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="gyazowin.cpp" />
+    <ClCompile Include="YabumiUploader.cpp">
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">None</DebugInformationFormat>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Full</Optimization>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">None</DebugInformationFormat>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gyazowin.h" />
+    <ClInclude Include="YabumiUploader.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="gyazowin.ico" />
+    <Image Include="YabumiUploader.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="gyazowin.rc" />
+    <ResourceCompile Include="YabumiUploader.rc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Readme.txt" />

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="FC275006-CDB9-4731-A264-517ACBD2A356" Name="Yabumi Uploader" Language="1033" Version="1.0.0.0" Manufacturer="Webnium" UpgradeCode="FB975E38-E450-4B9F-9FBB-BEBC7FAC8FB1">
+        <Package Description="Yabumi: private image sharer." InstallerVersion="200" Compressed="yes" />
+        <Media Id="1" Cabinet="yabumi.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder" Name="PFiles">
+                <Directory Id="Yabumi" Name="Yabumi">
+                    <Component Id="YabumiUploader.exe" Guid="8246864D-A609-4BA9-88D5-BF087EDC6D8C">
+                        <File Id="YABUMIUPLOADER.EXE" Name="YabumiUploader.exe" Source="..\Release\YabumiUploader.exe" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="YabumiUploader.exe" />
+        </Feature>
+        <UI />
+        <UIRef Id="WixUI_InstallDir" />
+        <Property Id="WIXUI_INSTALLDIR" Value="Yabumi" />
+        <WixVariable Id="WixUILicenseRtf" Value="EULA.rtf" />
+    </Product>
+</Wix>
