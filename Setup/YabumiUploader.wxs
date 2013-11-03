@@ -8,8 +8,8 @@
                 <Directory Id="Yabumi" Name="Yabumi">
                     <Component Id="YabumiUploader.exe" Guid="8246864D-A609-4BA9-88D5-BF087EDC6D8C">
                         <File Id="YABUMIUPLOADER.EXE" Name="YabumiUploader.exe" Source="..\Release\YabumiUploader.exe">
-                            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Yabumi Uploader" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="DesktopIcon.exe" IconIndex="0" />
-                            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Yabumi Uploader" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+                            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Yabumi Uploader" WorkingDirectory="INSTALLDIR" Advertise="no" Icon="DesktopIcon.exe" IconIndex="0" />
+                            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Yabumi Uploader" Advertise="no" Icon="StartMenuIcon.exe" IconIndex="0" />
                         </File>
                     </Component>
                 </Directory>
