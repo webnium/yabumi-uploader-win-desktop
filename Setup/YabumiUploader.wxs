@@ -7,17 +7,32 @@
             <Directory Id="ProgramFilesFolder" Name="PFiles">
                 <Directory Id="Yabumi" Name="Yabumi">
                     <Component Id="YabumiUploader.exe" Guid="8246864D-A609-4BA9-88D5-BF087EDC6D8C">
-                        <File Id="YABUMIUPLOADER.EXE" Name="YabumiUploader.exe" Source="..\Release\YabumiUploader.exe" />
+                        <File Id="YABUMIUPLOADER.EXE" Name="YabumiUploader.exe" Source="..\Release\YabumiUploader.exe">
+                            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Yabumi Uploader" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="DesktopIcon.exe" IconIndex="0" />
+                            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Yabumi Uploader" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+                        </File>
+                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="DesktopFolder" />
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ProgramMenuDir" Name="Yabumi">
+                    <Component Id="StartMenuShortcuts" Guid="4EA2B7F8-69E5-4B75-BC72-BAE5FAD07D9C">
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
                     </Component>
                 </Directory>
             </Directory>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
             <ComponentRef Id="YabumiUploader.exe" />
+            <ComponentRef Id="StartMenuShortcuts" />
         </Feature>
         <UI />
         <UIRef Id="WixUI_InstallDir" />
         <Property Id="WIXUI_INSTALLDIR" Value="Yabumi" />
         <WixVariable Id="WixUILicenseRtf" Value="EULA.rtf" />
+        <Icon Id="DesktopIcon.exe" SourceFile="..\Release\YabumiUploader.exe" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\Release\YabumiUploader.exe" />
     </Product>
 </Wix>
