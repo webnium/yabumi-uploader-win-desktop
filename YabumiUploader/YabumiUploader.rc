@@ -83,12 +83,12 @@ BEGIN
         BEGIN
             VALUE "Comments",         ""
             VALUE "CompanyName",      ""
-			VALUE "FileDescription",  "Gyazo: Screen Uploader"
+			VALUE "FileDescription",  "Yabumi: private image sharer."
             VALUE "FileVersion",      VER_FILEVERSION_STR
-            VALUE "InternalName",     "Gyazo"
-            VALUE "OriginalFileName", "Gyazo.exe"
-            VALUE "LegalCopyright",   "(c) Toshiyuki Masui"
-            VALUE "ProductName",      "Gyazo"
+            VALUE "InternalName",     "YabumiUploader"
+            VALUE "OriginalFileName", "YabumiUploader.exe"
+            VALUE "LegalCopyright",   "Gyazo forked by Webnium"
+            VALUE "ProductName",      "YabumiUploader"
             VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
         END
     END
@@ -107,7 +107,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_GYAZOWIN            ICON                    "gyazowin.ico"
+IDI_GYAZOWIN            ICON                    "YabumiUploader.ico"
 #endif    // “ú–{Œê resources
 /////////////////////////////////////////////////////////////////////////////
 
