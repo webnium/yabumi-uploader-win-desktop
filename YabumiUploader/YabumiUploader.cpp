@@ -840,7 +840,7 @@ void LastErrorMessageBox(HWND hwnd, LPTSTR lpszError)
 BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 {
 	const TCHAR* UPLOAD_SERVER	= _T("direct.yabumi.cc");
-	const TCHAR* UPLOAD_PATH	= _T("/api/image.txt");
+	const TCHAR* UPLOAD_PATH	= _T("/api/images.txt");
 
 	const char*  sBoundary = "----BOUNDARYBOUNDARY----";		// boundary
 	const char   sCrLf[]   = { 0xd, 0xa, 0x0 };					// 改行(CR+LF)
@@ -933,7 +933,7 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 			return FALSE;
 		}
 
-		if( _ttoi(resCode) != 200 ) {
+		if (_ttoi(resCode) != 200 && _ttoi(resCode) != 201) {
 			// upload 失敗 (status error)
 			TCHAR errorBuf[200];
 			StringCchPrintf((LPTSTR)errorBuf, 200, TEXT("Cannot upload the image. Error %s"),resCode);
@@ -946,7 +946,7 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 			TCHAR imgurl[200];
 			
 			memset(imgurl, 0, urlLen*sizeof(TCHAR));
-			_tcscpy_s(imgurl, _T("X-Yabumi-Image-Url"));
+			_tcscpy_s(imgurl, _T("Location"));
 
 			HttpQueryInfo(hRequest, HTTP_QUERY_CUSTOM, imgurl, &urlLen, 0);
 			if (GetLastError() != ERROR_HTTP_HEADER_NOT_FOUND && urlLen != 0) {
