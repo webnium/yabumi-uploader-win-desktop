@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="FC275006-CDB9-4731-A264-517ACBD2A356" Name="Yabumi Uploader" Language="1033" Version="1.0.0.1" Manufacturer="Webnium" UpgradeCode="FB975E38-E450-4B9F-9FBB-BEBC7FAC8FB1">
+    <Product Id="FC275006-CDB9-4731-A264-517ACBD2A356" Name="Yabumi Uploader" Language="1033" Version="1.1.0.0" Manufacturer="Webnium" UpgradeCode="FB975E38-E450-4B9F-9FBB-BEBC7FAC8FB1">
         <Package Description="Yabumi: private image sharer." InstallerVersion="200" Compressed="yes" />
         <Media Id="1" Cabinet="yabumi.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
@@ -8,8 +8,8 @@
                 <Directory Id="Yabumi" Name="Yabumi">
                     <Component Id="YabumiUploader.exe" Guid="8246864D-A609-4BA9-88D5-BF087EDC6D8C">
                         <File Id="YABUMIUPLOADER.EXE" Name="YabumiUploader.exe" Source="..\Release\YabumiUploader.exe">
-                            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Yabumi Uploader" WorkingDirectory="INSTALLDIR" Advertise="no" Icon="DesktopIcon.exe" IconIndex="0" />
-                            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Yabumi Uploader" Advertise="no" Icon="StartMenuIcon.exe" IconIndex="0" />
+                            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Yabumi" WorkingDirectory="INSTALLDIR" Advertise="no" Icon="DesktopIcon.exe" IconIndex="0" />
+                            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Yabumi" Advertise="no" Icon="StartMenuIcon.exe" IconIndex="0" />
                         </File>
                     </Component>
                 </Directory>
