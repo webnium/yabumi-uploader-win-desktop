@@ -5,13 +5,13 @@
 #include "YabumiUploader.h"
 
 // グローバル変数:
-HINSTANCE hInst;							// 現在のインターフェイス
-TCHAR *szTitle			= _T("Yabumi Uploader for Windows Desktop");// タイトル バーのテキスト
-TCHAR *szWindowClass	= _T("YABUMIUPLOADER");		// メイン ウィンドウ クラス名
-TCHAR *szWindowClassL	= _T("YABUMIUPLOADERL");		// レイヤー ウィンドウ クラス名
+HINSTANCE hInst;// 現在のインターフェイス
+TCHAR *szTitle        = _T("Yabumi Uploader for Windows Desktop");// タイトル バーのテキスト
+TCHAR *szWindowClass  = _T("YABUMIUPLOADER");// メイン ウィンドウ クラス名
+TCHAR *szWindowClassL = _T("YABUMIUPLOADERL");// レイヤー ウィンドウ クラス名
 HWND hLayerWnd;
 
-int ofX, ofY;	// 画面オフセット
+int ofX, ofY;// 画面オフセット
 
 // プロトタイプ宣言
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -314,10 +314,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     SetLayeredWindowAttributes(hLayerWnd, RGB(255, 0, 0), 100, LWA_COLORKEY|LWA_ALPHA);
 
-	
-
-
-	
 	return TRUE;
 }
 
@@ -325,29 +321,29 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 // Cited from MSDN Library: Retrieving the Class Identifier for an Encoder
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 {
-   UINT  num = 0;          // number of image encoders
-   UINT  size = 0;         // size of the image encoder array in bytes
+   UINT  num = 0;// number of image encoders
+   UINT  size = 0;// size of the image encoder array in bytes
 
    ImageCodecInfo* pImageCodecInfo = NULL;
 
    GetImageEncodersSize(&num, &size);
    if(size == 0)
-      return -1;  // Failure
+      return -1;// Failure
 
    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
    if(pImageCodecInfo == NULL)
-      return -1;  // Failure
+      return -1;// Failure
 
    GetImageEncoders(num, size, pImageCodecInfo);
 
    for(UINT j = 0; j < num; ++j)
    {
-      if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
-      {
-         *pClsid = pImageCodecInfo[j].Clsid;
-         free(pImageCodecInfo);
-         return j;  // Success
-      }    
+	   if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+	   {
+		   *pClsid = pImageCodecInfo[j].Clsid;
+		   free(pImageCodecInfo);
+		   return j;// Success
+	   }
    }
 
    free(pImageCodecInfo);
@@ -358,9 +354,9 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 VOID drawRubberband(HDC hdc, LPRECT newRect, BOOL erase)
 {
 	
-	static BOOL firstDraw = TRUE;	// 1 回目は前のバンドの消去を行わない
-	static RECT lastRect  = {0};	// 最後に描画したバンド
-	static RECT clipRect  = {0};	// 最後に描画したバンド
+	static BOOL firstDraw = TRUE;// 1 回目は前のバンドの消去を行わない
+	static RECT lastRect  = {0};// 最後に描画したバンド
+	static RECT clipRect  = {0};// 最後に描画したバンド
 	
 	if(firstDraw) {
 		// レイヤーウィンドウを表示
@@ -373,12 +369,11 @@ VOID drawRubberband(HDC hdc, LPRECT newRect, BOOL erase)
 	if (erase) {
 		// レイヤーウィンドウを隠す
 		ShowWindow(hLayerWnd, SW_HIDE);
-		
 	}
 
 	// 座標チェック
 	clipRect = *newRect;
-	if ( clipRect.right  < clipRect.left ) {
+	if ( clipRect.right < clipRect.left ) {
 		int tmp = clipRect.left;
 		clipRect.left   = clipRect.right;
 		clipRect.right  = tmp;
@@ -388,51 +383,17 @@ VOID drawRubberband(HDC hdc, LPRECT newRect, BOOL erase)
 		clipRect.top    = clipRect.bottom;
 		clipRect.bottom = tmp;
 	}
-	MoveWindow(hLayerWnd,  clipRect.left, clipRect.top, 
-			clipRect.right-  clipRect.left + 1, clipRect.bottom - clipRect.top + 1,true);
+	MoveWindow(
+		hLayerWnd,
+		clipRect.left,
+		clipRect.top,
+		clipRect.right - clipRect.left + 1,
+		clipRect.bottom - clipRect.top + 1,
+		true
+	);
 
 	
 	return;
-
-/* rakusai 2009/11/2
-
-	// XOR で描画
-	int hPreRop = SetROP2(hdc, R2_XORPEN);
-
-	// 点線
-	HPEN hPen = CreatePen(PS_DOT , 1, 0);
-	SelectObject(hdc, hPen);
-	SelectObject(hdc, GetStockObject(NULL_BRUSH));
-
-	if(!firstDraw) {
-		// 前のを消す
-		Rectangle(hdc, lastRect.left, lastRect.top, 
-			lastRect.right + 1, lastRect.bottom + 1);
-	} else {
-		firstDraw = FALSE;
-	}
-	
-	// 新しい座標を記憶
-	lastRect = *newRect;
-	
-	
-
-
-	if (!erase) {
-
-		// 枠を描画
-		Rectangle(hdc, lastRect.left, lastRect.top, 
-			lastRect.right + 1, lastRect.bottom + 1);
-
-	}
-
-
-	// 後処理
-	SetROP2(hdc, hPreRop);
-	DeleteObject(hPen);
-
-*/
-
 }
 
 // PNG 形式に変換
@@ -483,8 +444,7 @@ BOOL savePNG(LPCTSTR fileName, HBITMAP newBMP)
 	
 	if (GetEncoderClsid(L"image/png", &clsidEncoder)) {
 		// save!
-		if (0 ==
-			b->Save(fileName, &clsidEncoder, 0) ) {
+		if (0 == b->Save(fileName, &clsidEncoder, 0) ) {
 				// 保存できた
 				res = TRUE;
 		}
@@ -522,20 +482,20 @@ LRESULT CALLBACK LayerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		//矩形のサイズを出力
 		int fHeight;
 		fHeight = -MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-		hFont = CreateFont(fHeight,    //フォント高さ
-			0,                    //文字幅
-			0,                    //テキストの角度
-			0,                    //ベースラインとｘ軸との角度
-			FW_REGULAR,            //フォントの重さ（太さ）
-			FALSE,                //イタリック体
-			FALSE,                //アンダーライン
-			FALSE,                //打ち消し線
-			ANSI_CHARSET,    //文字セット
-			OUT_DEFAULT_PRECIS,    //出力精度
+		hFont = CreateFont(fHeight,//フォント高さ
+			0,//文字幅
+			0,//テキストの角度
+			0,//ベースラインとｘ軸との角度
+			FW_REGULAR,//フォントの重さ（太さ）
+			FALSE,//イタリック体
+			FALSE,//アンダーライン
+			FALSE,//打ち消し線
+			ANSI_CHARSET,//文字セット
+			OUT_DEFAULT_PRECIS,//出力精度
 			CLIP_DEFAULT_PRECIS,//クリッピング精度
-			PROOF_QUALITY,        //出力品質
+			PROOF_QUALITY,//出力品質
 			FIXED_PITCH | FF_MODERN,//ピッチとファミリー
-			L"Tahoma");    //書体名
+			L"Tahoma");//書体名
 
 		SelectObject(hdc, hFont);
 		// show size
@@ -572,7 +532,6 @@ LRESULT CALLBACK LayerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
-
 }
 
 // ウィンドウプロシージャ
@@ -650,12 +609,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(hLayerWnd);
 
 			// 座標チェック
-			if ( clipRect.right  < clipRect.left ) {
+			if (clipRect.right < clipRect.left) {
 				int tmp = clipRect.left;
 				clipRect.left   = clipRect.right;
 				clipRect.right  = tmp;
 			}
-			if ( clipRect.bottom < clipRect.top  ) {
+			if (clipRect.bottom < clipRect.top) {
 				int tmp = clipRect.top;
 				clipRect.top    = clipRect.bottom;
 				clipRect.bottom = tmp;
@@ -686,17 +645,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 			// ウィンドウを隠す!
 			ShowWindow(hWnd, SW_HIDE);
-			/*
-			// 画像をクリップボードにコピー
-			if ( OpenClipboard(hWnd) ) {
-				// 消去
-				EmptyClipboard();
-				// セット
-				SetClipboardData(CF_BITMAP, newBMP);
-				// 閉じる
-				CloseClipboard();
-			}
-			*/
 			
 			// テンポラリファイル名を決定
 			TCHAR tmpDir[MAX_PATH], tmpFile[MAX_PATH];
@@ -704,33 +652,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			GetTempFileName(tmpDir, _T("gya"), 0, tmpFile);
 			
 			if (savePNG(tmpFile, newBMP)) {
-
 				// うｐ
-				if (!uploadFile(hWnd, tmpFile)) {
-					// アップロードに失敗...
-					// エラーメッセージは既に表示されている
-
-					/*
-					TCHAR sysDir[MAX_PATH];
-					if (SUCCEEDED(StringCchCopy(sysDir, MAX_PATH, tmpFile)) &&
-						SUCCEEDED(StringCchCat(sysDir, MAX_PATH, _T(".png")))) {
-						
-						MoveFile(tmpFile, sysDir);
-						SHELLEXECUTEINFO lsw = {0};
-						
-						lsw.hwnd	= hWnd;
-						lsw.cbSize	= sizeof(SHELLEXECUTEINFO);
-						lsw.lpVerb	= _T("open");
-						lsw.lpFile	= sysDir;
-
-						ShellExecuteEx(&lsw);
-					}
-					*/
-				}
+				uploadFile(hWnd, tmpFile);
 			} else {
 				// PNG保存失敗...
-				MessageBox(hWnd, _T("Cannot save png image"), szTitle, 
-					MB_OK | MB_ICONERROR);
+				MessageBox(hWnd, _T("Cannot save png image"), szTitle, MB_OK | MB_ICONERROR);
 			}
 
 			// 後始末
@@ -842,12 +768,12 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 	const TCHAR* UPLOAD_SERVER	= _T("direct.yabumi.cc");
 	const TCHAR* UPLOAD_PATH	= _T("/api/images.txt");
 
-	const char*  sBoundary = "----BOUNDARYBOUNDARY----";		// boundary
-	const char   sCrLf[]   = { 0xd, 0xa, 0x0 };					// 改行(CR+LF)
+	const char*  sBoundary = "----BOUNDARYBOUNDARY----";// boundary
+	const char   sCrLf[]   = { 0xd, 0xa, 0x0 };// 改行(CR+LF)
 	const TCHAR* szHeader  = 
 		_T("Content-type: multipart/form-data; boundary=----BOUNDARYBOUNDARY----");
 
-	std::ostringstream	buf;	// 送信メッセージ
+	std::ostringstream	buf;// 送信メッセージ
 
 	// メッセージの構成
 	// -- "imagedata" part
@@ -868,7 +794,7 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 		png.close();
 		return FALSE;
 	}
-	buf << png.rdbuf();		// read all & append to buffer
+	buf << png.rdbuf();// read all & append to buffer
 	png.close();
 
 	// 最後
