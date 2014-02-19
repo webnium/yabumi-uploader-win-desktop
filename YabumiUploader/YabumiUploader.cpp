@@ -859,10 +859,15 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 			return FALSE;
 		}
 
-		if (_ttoi(resCode) != 200 && _ttoi(resCode) != 201) {
+		if (_ttoi(resCode) == 403) {
+			// 403
+			TCHAR errorBuf[200];
+			StringCchPrintf((LPTSTR)errorBuf, 200, TEXT("Cannot upload the image. Error %s (Image is too small?)"), resCode);
+			MessageBox(hwnd, errorBuf, szTitle, MB_ICONERROR | MB_OK);
+		} else if (_ttoi(resCode) != 200 && _ttoi(resCode) != 201) {
 			// upload 失敗 (status error)
 			TCHAR errorBuf[200];
-			StringCchPrintf((LPTSTR)errorBuf, 200, TEXT("Cannot upload the image. Error %s"),resCode);
+			StringCchPrintf((LPTSTR)errorBuf, 200, TEXT("Cannot upload the image. Error %s"), resCode);
 			MessageBox(hwnd, errorBuf, szTitle, MB_ICONERROR | MB_OK);
 		} else {
 			// upload succeeded
@@ -888,10 +893,9 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 			DWORD len;
 			char  resbuf[1024];
 			std::string result;
-			
+
 			// そんなに長いことはないけどまあ一応
-			while(InternetReadFile(hRequest, (LPVOID) resbuf, 1024, &len) 
-				&& len != 0)
+			while (InternetReadFile(hRequest, (LPVOID)resbuf, 1024, &len) && len != 0)
 			{
 				result.append(resbuf, len);
 			}
