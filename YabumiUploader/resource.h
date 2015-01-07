@@ -1,7 +1,8 @@
-Ôªø//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by gyazowin.rc
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ Ç≈ê∂ê¨Ç≥ÇÍÇΩÉCÉìÉNÉãÅ[Éh ÉtÉ@ÉCÉãÅB
+// YabumiUploader.rc Ç≈égóp
 //
+#define VER_DEBUG                       0
 #define IDD_GYAZOWIN_DIALOG             102
 #define IDI_SMALL                       108
 #define IDR_MAINFRAME                   128

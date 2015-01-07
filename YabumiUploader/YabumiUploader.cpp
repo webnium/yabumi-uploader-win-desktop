@@ -26,6 +26,7 @@ BOOL				isGif(LPCTSTR fileName);
 BOOL				isJpg(LPCTSTR fileName);
 BOOL				isSvg(LPCTSTR fileName);
 BOOL				isPdf(LPCTSTR fileName);
+BOOL				isPsd(LPCTSTR fileName);
 VOID				drawRubberband(HDC hdc, LPRECT newRect, BOOL erase);
 VOID				execUrl(const char* str);
 VOID				setClipBoardText(const char* str);
@@ -67,7 +68,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	if ( 2 == __argc )
 	{
 		// ファイルをアップロードして終了
-		if (isPng(__targv[1]) || isJpg(__targv[1]) || isGif(__targv[1]) || isSvg(__targv[1]) || isPdf(__targv[1])) {
+		if (isPng(__targv[1]) || isJpg(__targv[1]) || isGif(__targv[1]) || isSvg(__targv[1]) || isPdf(__targv[1]) || isPsd(__targv[1])) {
 			// PNG はそのままupload
 			uploadFile(NULL, __targv[1]);
 		} else {
@@ -217,7 +218,30 @@ BOOL isPdf(LPCTSTR fileName)
 
 	// compare
 	for (unsigned int i = 0; i<7; i++)
-	if (pdfHead[i] != readHead[i]) return FALSE;
+		if (pdfHead[i] != readHead[i]) return FALSE;
+
+	return TRUE;
+
+}
+
+// ヘッダを見て PSD かどうか(一応)チェック
+BOOL isPsd(LPCTSTR fileName)
+{
+	unsigned char psdHead[] = { 0x38, 0x42, 0x50, 0x53, 0x00, 0x01, 0x00 };
+	unsigned char readHead[7];
+
+	FILE *fp = NULL;
+
+	if (0 != _tfopen_s(&fp, fileName, _T("rb")) ||
+		7 != fread(readHead, 1, 7, fp)) {
+		// ファイルが読めない	
+		return FALSE;
+	}
+	fclose(fp);
+
+	// compare
+	for (unsigned int i = 0; i<7; i++)
+		if (psdHead[i] != readHead[i]) return FALSE;
 
 	return TRUE;
 
@@ -808,7 +832,7 @@ BOOL uploadFile(HWND hwnd, LPCTSTR fileName)
 	std::string oMsg(buf.str());
 
 	// WinInet を準備 (proxy は 規定の設定を利用)
-	HINTERNET hSession    = InternetOpen(_T("YabumiUploaderForWindowsDesktop/1.1 Gyazowin/1.0"), 
+	HINTERNET hSession    = InternetOpen(_T("YabumiUploaderForWindowsDesktop/1.3 Gyazowin/1.0"), 
 		INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if(NULL == hSession) {
 		LastErrorMessageBox(hwnd, _T("Cannot configure wininet."));
