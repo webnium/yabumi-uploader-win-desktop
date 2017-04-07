@@ -1,1 +1,1 @@
-signtool sign /v /du https://yabumi.cc/ /sha1 E9CF05B24CCE1268DA7D000EDCE15C6A849BE6DE /tr http://www.startssl.com/timestamp ..\Release\YabumiUploader.exe
+signtool sign /v /du https://yabumi.cc/ /sha1 E9CF05B24CCE1268DA7D000EDCE15C6A849BE6DE /tr http://tsa.startssl.com/rfc3161 ..\Release\YabumiUploader.exe
